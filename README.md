@@ -2,6 +2,10 @@
 
 Linkist is a Chrome extension (Manifest V3) that scans the active webpage and lists all unique anchor links (`<a href>`).
 
+## Preview
+
+![Linkist preview](images/linkist.png)
+
 ## Features
 
 - Scans links from the current active tab

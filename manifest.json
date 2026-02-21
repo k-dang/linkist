@@ -4,8 +4,19 @@
   "version": "1.0.0",
   "description": "Identify and list links on the current webpage.",
   "permissions": ["activeTab", "scripting", "tabs"],
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
   "action": {
     "default_title": "Linkist",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png"
+    }
   }
 }
