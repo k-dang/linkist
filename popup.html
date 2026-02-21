@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linkist</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup" aria-live="polite">
+      <header class="header">
+        <h1 class="title">Linkist</h1>
+        <p id="link-count" class="count">Scanning page links...</p>
+      </header>
+
+      <section id="status" class="status" role="status">Scanning page links...</section>
+
+      <ul id="links-list" class="links" aria-label="Detected page links"></ul>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

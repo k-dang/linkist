@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Linkist",
+  "version": "1.0.0",
+  "description": "Identify and list links on the current webpage.",
+  "permissions": ["activeTab", "scripting", "tabs"],
+  "action": {
+    "default_title": "Linkist",
+    "default_popup": "popup.html"
+  }
+}
