@@ -10,7 +10,10 @@
     <main class="popup" aria-live="polite">
       <header class="header">
         <h1 class="title">Linkist</h1>
-        <p id="link-count" class="count">Scanning page links...</p>
+        <div class="header-actions">
+          <p id="link-count" class="count">Scanning page links...</p>
+          <button id="export-csv" class="export-button" type="button" disabled>Export CSV</button>
+        </div>
       </header>
 
       <section id="status" class="status" role="status">Scanning page links...</section>

@@ -1,6 +1,12 @@
 const statusEl = document.getElementById('status');
 const listEl = document.getElementById('links-list');
 const countEl = document.getElementById('link-count');
+const exportButtonEl = document.getElementById('export-csv');
+
+let currentLinks = [];
+let currentPageUrl = '';
+
+exportButtonEl.addEventListener('click', handleExportClick);
 
 initialize();
 
@@ -13,6 +19,8 @@ async function initialize() {
       throw new Error('No active tab found.');
     }
 
+    currentPageUrl = tab.url;
+
     const links = await extractLinksFromTab(tab.id);
     renderLinks(links);
   } catch (error) {
@@ -21,10 +29,12 @@ async function initialize() {
 }
 
 function setLoadingState() {
+  currentLinks = [];
   statusEl.textContent = 'Scanning page links...';
   statusEl.classList.remove('hidden');
   listEl.classList.add('hidden');
   countEl.textContent = 'Scanning page links...';
+  exportButtonEl.disabled = true;
 }
 
 async function getActiveTab() {
@@ -61,6 +71,7 @@ async function extractLinksFromTab(tabId) {
 }
 
 function renderLinks(links) {
+  currentLinks = links;
   listEl.innerHTML = '';
 
   if (!links.length) {
@@ -68,12 +79,14 @@ function renderLinks(links) {
     statusEl.classList.remove('hidden');
     listEl.classList.add('hidden');
     countEl.textContent = '0 links';
+    exportButtonEl.disabled = true;
     return;
   }
 
   countEl.textContent = `${links.length} ${links.length === 1 ? 'link' : 'links'}`;
   statusEl.classList.add('hidden');
   listEl.classList.remove('hidden');
+  exportButtonEl.disabled = false;
 
   for (const link of links) {
     const item = document.createElement('li');
@@ -101,10 +114,53 @@ function renderLinks(links) {
 }
 
 function renderError(message) {
+  currentLinks = [];
   listEl.classList.add('hidden');
   statusEl.classList.remove('hidden');
   statusEl.textContent = message;
   countEl.textContent = 'Unable to read links';
+  exportButtonEl.disabled = true;
+}
+
+function handleExportClick() {
+  if (!currentLinks.length) {
+    return;
+  }
+
+  const csv = buildCsv(currentLinks, currentPageUrl);
+  const filename = `linkist-links-${new Date().toISOString().slice(0, 10)}.csv`;
+  downloadCsv(csv, filename);
+}
+
+function buildCsv(links, pageUrl) {
+  const header = ['text', 'url', 'title', 'page_url'];
+  const rows = links.map((link) => [
+    escapeCsvCell(link.text),
+    escapeCsvCell(link.url),
+    escapeCsvCell(link.title),
+    escapeCsvCell(pageUrl)
+  ]);
+
+  return [header.join(','), ...rows.map((row) => row.join(','))].join('\r\n');
+}
+
+function escapeCsvCell(value) {
+  const normalized = String(value ?? '');
+  const escaped = normalized.replace(/"/g, '""');
+  return `"${escaped}"`;
+}
+
+function downloadCsv(csvText, filename) {
+  const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function getUserFriendlyError(error) {
