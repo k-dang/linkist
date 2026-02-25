@@ -12,7 +12,9 @@ Linkist is a Chrome extension (Manifest V3) that scans the active webpage and li
 - Includes anchor links only (`a[href]`)
 - Deduplicates links by normalized absolute URL
 - Preserves page DOM order
+- Captures link text and `title` metadata for each result
 - Opens selected links in a new tab from the popup
+- Exports detected links to CSV (`text`, `url`, `title`, `page_url`)
 - Handles restricted pages gracefully (for example `chrome://` pages)
 
 ## Tech Stack
@@ -55,12 +57,13 @@ Linkist is a Chrome extension (Manifest V3) that scans the active webpage and li
 - If no links are found, it shows an empty state.
 - If the page is restricted, it shows an error state.
 - Clicking a link row opens that URL in a new tab.
+- The **Export CSV** button is enabled only when links are available.
+- CSV exports include one row per detected unique link plus the source page URL.
 
 ## Development Notes
 
 - This is a minimal greenfield implementation intended for quick iteration.
 - Potential next enhancements:
   - Copy all URLs
-  - Export CSV
   - Filtering and search in popup
   - Side panel or full-page results view
