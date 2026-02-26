@@ -65,5 +65,3 @@ Linkist is a Chrome extension (Manifest V3) that scans the active webpage and li
 - This is a minimal greenfield implementation intended for quick iteration.
 - Potential next enhancements:
   - Copy all URLs
-  - Filtering and search in popup
-  - Side panel or full-page results view
