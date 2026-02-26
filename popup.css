@@ -78,6 +78,31 @@ body {
   color: #57606a;
 }
 
+.search-label {
+  font-size: 12px;
+  color: #57606a;
+}
+
+.search-input {
+  width: 100%;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1f2328;
+  font-size: 13px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+.search-input:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+}
+
+.search-input:disabled {
+  opacity: 0.7;
+}
+
 .status.hidden {
   display: none;
 }

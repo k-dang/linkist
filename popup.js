@@ -2,11 +2,15 @@ const statusEl = document.getElementById('status');
 const listEl = document.getElementById('links-list');
 const countEl = document.getElementById('link-count');
 const exportButtonEl = document.getElementById('export-csv');
+const searchInputEl = document.getElementById('link-search');
 
-let currentLinks = [];
+let allLinks = [];
+let filteredLinks = [];
+let currentQuery = '';
 let currentPageUrl = '';
 
 exportButtonEl.addEventListener('click', handleExportClick);
+searchInputEl.addEventListener('input', handleSearchInput);
 
 initialize();
 
@@ -29,7 +33,11 @@ async function initialize() {
 }
 
 function setLoadingState() {
-  currentLinks = [];
+  allLinks = [];
+  filteredLinks = [];
+  currentQuery = '';
+  searchInputEl.value = '';
+  searchInputEl.disabled = true;
   statusEl.textContent = 'Scanning page links...';
   statusEl.classList.remove('hidden');
   listEl.classList.add('hidden');
@@ -71,10 +79,14 @@ async function extractLinksFromTab(tabId) {
 }
 
 function renderLinks(links) {
-  currentLinks = links;
-  listEl.innerHTML = '';
+  allLinks = links;
+  currentQuery = '';
+  searchInputEl.value = '';
+  searchInputEl.disabled = !allLinks.length;
 
-  if (!links.length) {
+  if (!allLinks.length) {
+    filteredLinks = [];
+    listEl.innerHTML = '';
     statusEl.textContent = 'No links found on this page.';
     statusEl.classList.remove('hidden');
     listEl.classList.add('hidden');
@@ -83,12 +95,36 @@ function renderLinks(links) {
     return;
   }
 
-  countEl.textContent = `${links.length} ${links.length === 1 ? 'link' : 'links'}`;
+  applyFilterAndRender();
+}
+
+function handleSearchInput() {
+  currentQuery = searchInputEl.value.trim();
+  applyFilterAndRender();
+}
+
+function applyFilterAndRender() {
+  filteredLinks = filterLinks(allLinks, currentQuery);
+  listEl.innerHTML = '';
+
+  if (!filteredLinks.length) {
+    statusEl.textContent = 'No links match your search.';
+    statusEl.classList.remove('hidden');
+    listEl.classList.add('hidden');
+    countEl.textContent = `0 of ${allLinks.length} links`;
+    exportButtonEl.disabled = true;
+    return;
+  }
+
+  const hasQuery = Boolean(currentQuery);
+  countEl.textContent = hasQuery
+    ? `${filteredLinks.length} of ${allLinks.length} links`
+    : `${allLinks.length} ${allLinks.length === 1 ? 'link' : 'links'}`;
   statusEl.classList.add('hidden');
   listEl.classList.remove('hidden');
   exportButtonEl.disabled = false;
 
-  for (const link of links) {
+  for (const link of filteredLinks) {
     const item = document.createElement('li');
     item.className = 'link-item';
 
@@ -113,8 +149,26 @@ function renderLinks(links) {
   }
 }
 
+function filterLinks(links, query) {
+  if (!query) {
+    return links;
+  }
+
+  const normalizedQuery = query.toLowerCase();
+  return links.filter((link) => {
+    const text = String(link.text || '').toLowerCase();
+    const title = String(link.title || '').toLowerCase();
+    const url = String(link.url || '').toLowerCase();
+    return text.includes(normalizedQuery) || title.includes(normalizedQuery) || url.includes(normalizedQuery);
+  });
+}
+
 function renderError(message) {
-  currentLinks = [];
+  allLinks = [];
+  filteredLinks = [];
+  currentQuery = '';
+  searchInputEl.value = '';
+  searchInputEl.disabled = true;
   listEl.classList.add('hidden');
   statusEl.classList.remove('hidden');
   statusEl.textContent = message;
@@ -123,11 +177,11 @@ function renderError(message) {
 }
 
 function handleExportClick() {
-  if (!currentLinks.length) {
+  if (!filteredLinks.length) {
     return;
   }
 
-  const csv = buildCsv(currentLinks, currentPageUrl);
+  const csv = buildCsv(filteredLinks, currentPageUrl);
   const filename = `linkist-links-${new Date().toISOString().slice(0, 10)}.csv`;
   downloadCsv(csv, filename);
 }
